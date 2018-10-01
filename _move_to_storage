@@ -1,0 +1,18 @@
+#!/bin/bash
+
+FROM=$1
+TO=$2
+
+# Someone thought base64 was the right format for an MD5 sum.
+MD5=$(python -c "import md5; f = open('$1'); print md5.new(f.read()).digest().encode('base64').strip()")
+
+# We are assuming this isn't going to stomp on an existing file, and hopefully
+# gsutil only returns success on ... success.
+gsutil -q -h Content-MD5:$MD5 cp -n $1 gs://$2
+if [ $? -ne 0 ]; then
+  echo "Failed to copy $1 to $2"
+  exit 1
+fi
+
+echo "Copied $1 to $2, deleting original."
+rm $1

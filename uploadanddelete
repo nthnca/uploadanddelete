@@ -1,0 +1,18 @@
+#!/bin/bash
+
+alias uploadanddelete="BUCKET=gsbucket FILES_TO_COPY=/Path/to/SDCARD
+CODE_PATH=/Users/name/uploadanddelete ~/uploadanddelete/uploadanddelete"
+
+STAMP=`date +%s`
+PARRALEL="_parallel"
+MOVE_CMD="_move_to_storage"
+MAX_PROCESSES=20
+BASE=$(basename $FILES_TO_COPY)
+DIRNAME=$(dirname $FILES_TO_COPY)
+
+cd $CODE_PATH
+
+# This is hideous...
+( cd $DIRNAME; find $BASE -type f ) | \
+  sed "s+\(.*\)+./$MOVE_CMD $DIRNAME/\1 $BUCKET\/$STAMP\/\1+g" | \
+  ./$PARRALEL $MAX_PROCESSES
